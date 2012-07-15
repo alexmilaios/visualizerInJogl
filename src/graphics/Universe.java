@@ -1,11 +1,12 @@
 package graphics;
 
-
 import graph.Connection;
 import graph.Node;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.Vector;
 
@@ -19,18 +20,32 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
 
+
 import sort.SenderReceiverPairs;
 
 import com.jogamp.opengl.util.Animator;
 
-public class Universe extends JFrame implements KeyListener{
 
-	//private float w=1,h=1;
+public class Universe extends JFrame implements KeyListener, MouseListener{
 	
+	// phi is the angle between y-axis and the position vector of the camera
 	private static float phi = 0.0f;
+	
+	// thita is the angle between z-axis and the projection  
+	// of the position vector of the camera at xz - plain
 	private static float thita = (float) (Math.PI / 2 );
+	
+	// the radius of the sphere on which the camera is moved
 	private static float radius = 20.0f;
+	
+	// the model is used for keeping the points of the model 
+	// and for producing the elements of the visualizer 
 	private Model model;
+	
+	// Coordinates on the screen
+	private int screen_x, screen_y;
+	
+	private boolean mouseClicked;
 	
 	public Universe (List<List<Node>> levels, Vector<SenderReceiverPairs> messages, List<Connection> connections) {
 		setSize(700, 700);
@@ -42,12 +57,18 @@ public class Universe extends JFrame implements KeyListener{
 		GLCanvas canvas = new GLCanvas(new GLCapabilities(null));
 		
 		canvas.addGLEventListener(listener);
+		canvas.addKeyListener(this);
+		canvas.addMouseListener(this);
+		canvas.setFocusable(true);
+		
 		getContentPane().add(canvas);
+		
+		screen_x = screen_y = 0;
+		
+		mouseClicked = false;
 		
 		Animator animator = new Animator(canvas);
 		animator.start();
-		
-		addKeyListener(this);
 	}
 	
 	
@@ -55,10 +76,11 @@ public class Universe extends JFrame implements KeyListener{
 
 		@Override
 		public void display(GLAutoDrawable drawable) {
-			// TODO Auto-generated method stub
+			// Clear image
 			GL2 gl = (GL2) drawable.getGL();
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 			
+			// gl settings
 			gl.glEnable(GL.GL_DEPTH_TEST); 
 			gl.glCullFace(GL.GL_FRONT); 
 			gl.glEnable(GL.GL_CULL_FACE); 
@@ -68,6 +90,7 @@ public class Universe extends JFrame implements KeyListener{
 			
 			GLU glu = new GLU();
 			
+			// set properly the camera
 			setCamera(gl, glu);
 			
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
@@ -77,15 +100,26 @@ public class Universe extends JFrame implements KeyListener{
 			gl.glDisable(GL2.GL_LINE_STIPPLE);
 			gl.glEnable(GL.GL_LINE_SMOOTH);
 			
+			// draw the spheres of the model
 			model.drawPoints(glu, gl);
 			gl.glColor3f(0.0f, 1.0f, 0.0f);
+			
+			// draw initial topology
 			model.drawGraph(gl);
 			
+			// draw vertical lines corresponding to time-line 
 			gl.glColor3f(0.0f, 0.0f, 1.0f);
 			model.drawTimeLines(gl);
 			
+			// draw the exchange messages
 			gl.glColor3f(1.0f, 0.0f, 0.0f);
 			model.drawMessages(gl);
+			
+			if(mouseClicked) {
+				model.checkPosition(screen_x, screen_y ,model.getAreas(gl, glu));
+				mouseClicked =false;
+			}
+			
 		}
 
 		@Override
@@ -125,7 +159,7 @@ public class Universe extends JFrame implements KeyListener{
 	        glu.gluLookAt(getXCoordinate(radius), getYCoordinate(radius),getZCoordinate(radius), 
 	        		0, 0, 0, 
 	        		0, (correctElevation() == -1) ? -1 : 1, 0);
-
+	        
 	        // Change back to model view matrix.
 	        gl.glMatrixMode(GL2.GL_MODELVIEW);
 	        gl.glLoadIdentity();
@@ -158,6 +192,7 @@ public class Universe extends JFrame implements KeyListener{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_UP) { 
@@ -198,5 +233,39 @@ public class Universe extends JFrame implements KeyListener{
 		// TODO Auto-generated method stub
 		
 	}
+
+	
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		screen_x = e.getX();
+		screen_y = e.getY();
+		mouseClicked = true;
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

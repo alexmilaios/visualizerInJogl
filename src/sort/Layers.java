@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-
-
 public class Layers {
 
 	public List<List<Node>> layers;

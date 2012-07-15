@@ -4,6 +4,7 @@ import graph.Connection;
 import graph.Node;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -14,6 +15,7 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 import javax.vecmath.Vector3f;
 
+import sort.Pair;
 import sort.SenderReceiverPairs;
 
 
@@ -24,6 +26,7 @@ public class Model {
 	private List<Connection> connections;
 	private List<List<Node>> sortedGraph;
 	private Vector<SenderReceiverPairs> messages;
+	
 	
 	public Model(int levels, int numOfNodes,List<Connection> connections, 
 			List<List<Node>> sortedGraph, Vector<SenderReceiverPairs> messages){
@@ -37,14 +40,25 @@ public class Model {
 	}
 	
 	private void computePoints () {
+		
+		// pre-compute the points across the circle 
+		List<Vector3f> modelPoints =  new ArrayList<Vector3f>();
+		for(int i = 0; i < numOfNodes; i++) {
+			modelPoints.add(new Vector3f((float) ( 3 * Math.cos((2*Math.PI/numOfNodes)*(i) + Math.PI/4 )), 
+						0.0f,(float) (3 * Math.sin((2*Math.PI / numOfNodes)*(i) + Math.PI/4 ))));
+		}
+		
+		// a factor which centralizes the model towards (0,0,0)
+		float layer_y =  (float) (levels-1 -(levels-1)/2.0);
+		
+		// construction of the the points in the three dimension universe 
 		for(int i = 0; i < levels; i++) {
 			List<Vector3f> layer = new ArrayList<Vector3f>();
 			for(int j = 0; j < numOfNodes; j++) {
-				layer.add(new Vector3f((float) ( 3 * Math.cos((2*Math.PI/numOfNodes)*(j) + Math.PI/4 )), 
-						(float) (levels-i-1 -(levels-1)/2),(float) (3 * Math.sin((2*Math.PI / numOfNodes)*(j) + Math.PI/4 ))));
+				layer.add(new Vector3f(modelPoints.get(j).x, layer_y - i,modelPoints.get(j).z));
 			}
 			if(i == 0) {
-				layer.add(new Vector3f(0.0f, (float) (levels-i-1 -(levels-1)/2), 0.0f));
+				layer.add(new Vector3f(0.0f, (float) (levels-1 -(levels-1)/2.0), 0.0f));
 			}
 			layers.add(layer);
 		}
@@ -64,7 +78,6 @@ public class Model {
 
 				gl.glLoadIdentity();
 				gl.glTranslatef(point.x, point.y, point.z);
-				
 				glu.gluSphere(quadric, 0.07, 8, 8);
 			}
 		}
@@ -131,4 +144,53 @@ public class Model {
 			gl.glVertex3f(end.x, end.y, end.z);
 		gl.glEnd();
 	}
+	
+	public List<List<AreaOfNode>> getAreas(GL2 gl, GLU glu) {
+		List<List<AreaOfNode>> areas = new ArrayList<List<AreaOfNode>>();
+		
+		float [] projection = new float [16];
+		gl.glGetFloatv(GL2.GL_PROJECTION_MATRIX,projection,0);
+        
+		float [] modelView = new float [16]; 
+		gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX ,modelView,0);
+        
+		float [] screenCoordiants = new float[4];
+        
+        int [] viewPort = new int[4];
+        gl.glGetIntegerv(GL.GL_VIEWPORT, viewPort,0);
+        
+        for(int i = 0; i < layers.size(); i++) {
+        	List<AreaOfNode> areasOfLevel = new ArrayList<AreaOfNode>();
+        	for(int j = 0; j < numOfNodes; j++) {
+        		Vector3f currentPoint = layers.get(i).get(j);
+        		glu.gluProject(currentPoint.x, currentPoint.y, currentPoint.z, 
+        				modelView, 0, 
+        				projection, 0, 
+        				viewPort, 0, 
+        				screenCoordiants, 0);
+        		screenCoordiants[1] = viewPort[3] - screenCoordiants[1] + 1;
+        		Node node = new Node(new Pair(j+1, i-1));
+        		areasOfLevel.add(new AreaOfNode(node, (int) screenCoordiants[0], (int) screenCoordiants[1]));
+        	}
+        	areas.add(areasOfLevel);
+        }
+       return areas;
+	}
+	
+	public void checkPosition(int x, int y, List<List<AreaOfNode>> areas){
+		Iterator<List<AreaOfNode>> areasItr = areas.iterator();
+
+		while(areasItr.hasNext()) {
+			List<AreaOfNode> currentLevel = areasItr.next();
+
+			Iterator<AreaOfNode> areaItr = currentLevel.iterator();
+			while(areaItr.hasNext()) {
+				AreaOfNode area = areaItr.next();
+
+				if(area.contains(x, y))
+					System.out.println(area);
+			}
+		}
+	}
 }
+
