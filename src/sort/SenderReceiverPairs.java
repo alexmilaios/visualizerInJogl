@@ -12,6 +12,10 @@ public class SenderReceiverPairs {
 			this.receiver = new Node(receiver); 
 	}
 	
+	public boolean equals(Object pair) {
+		return (this.toString().equals(pair.toString()));
+	}
+	
 	public String toString() {
 		return sender.toString() + " -> " + receiver.toString();
 	}

@@ -26,6 +26,7 @@ public class Model {
 	private List<Connection> connections;
 	private List<List<Node>> sortedGraph;
 	private Vector<SenderReceiverPairs> messages;
+	private boolean pointForDraw [] [];  
 	
 	
 	public Model(int levels, int numOfNodes,List<Connection> connections, 
@@ -37,6 +38,7 @@ public class Model {
 		this.sortedGraph = sortedGraph;
 		this.messages = messages;
 		computePoints();
+		pointForDraw = new boolean[levels] [numOfNodes+1];
 	}
 	
 	private void computePoints () {
@@ -57,9 +59,11 @@ public class Model {
 			for(int j = 0; j < numOfNodes; j++) {
 				layer.add(new Vector3f(modelPoints.get(j).x, layer_y - i,modelPoints.get(j).z));
 			}
+			
 			if(i == 0) {
 				layer.add(new Vector3f(0.0f, (float) (levels-1 -(levels-1)/2.0), 0.0f));
 			}
+			
 			layers.add(layer);
 		}
 	}
@@ -71,15 +75,27 @@ public class Model {
 		
 		GLUquadric quadric = glu.gluNewQuadric();
 		glu.gluQuadricNormals(quadric, GL.GL_TRUE);
-		gl.glColor3f(1.0f,1.0f,1.0f);
+		
+		int i,j;
+		i = j = 0;
 		
 		for(List<Vector3f> layer : layers) {
 			for(Vector3f point : layer) {
-
-				gl.glLoadIdentity();
-				gl.glTranslatef(point.x, point.y, point.z);
-				glu.gluSphere(quadric, 0.07, 8, 8);
+				if(pointForDraw[i][j] || i== 0 ){
+					gl.glColor3f(1.0f,1.0f,1.0f);
+					gl.glLoadIdentity();
+					gl.glTranslatef(point.x, point.y, point.z);
+					glu.gluSphere(quadric, 0.07, 8, 8);
+				}else {
+					gl.glColor3f(0.4f,0.4f,0.4f);
+					gl.glLoadIdentity();
+					gl.glTranslatef(point.x, point.y, point.z);
+					glu.gluSphere(quadric, 0.07, 8, 8);
+				}
+				j++;
 			}
+			j=0;
+			i++;
 		}
 	}
 	
@@ -103,10 +119,22 @@ public class Model {
 			List<Node> level = sortedGraph.get(i);
 			for(Node node : level) {
 				Vector3f end = layers.get(i).get(node.pair.getNode()-1);
-				Node sender = getSender(node);
-				int senderId = (sender.pair.getNode() == 0) ? numOfNodes : sender.pair.getNode()-1;
-				Vector3f start = layers.get(getSenderLevel(sender)).get(senderId);
-				drawLine(gl, start, end);
+				
+				pointForDraw[i][node.pair.getNode()-1] = true;
+				
+				List<Node> senderList = getSender(node);
+				Iterator<Node> senderItr= senderList.iterator();
+				
+				while(senderItr.hasNext()) {
+					Node sender = senderItr.next();
+					int senderlevel = getSenderLevel(sender);
+					int senderId = (sender.pair.getNode() == 0) ? numOfNodes : sender.pair.getNode()-1;
+					Vector3f start = layers.get(senderlevel).get(senderId);
+					
+					pointForDraw [senderlevel] [senderId] = true;
+					
+					drawLine(gl, start, end);
+				}
 			}
 		}
 	}
@@ -122,14 +150,15 @@ public class Model {
 		return -1;
 	}
 	
-	private Node getSender(Node receiver){
+	private List<Node> getSender(Node receiver){
+		List<Node> sendersList = new ArrayList<Node>();
 		for(int i = 0; i < messages.size(); i++) {
 			SenderReceiverPairs pair = messages.elementAt(i);
 			if(pair.getReceiver().toString().equals(receiver.toString())) {
-				return pair.getSender();
+				sendersList.add(pair.getSender());
 			}
 		}
-		return null;
+		return sendersList;
 	}
 	
 	private void drawLine(GL2 gl, Vector3f start, Vector3f end) {

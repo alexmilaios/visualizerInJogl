@@ -2,3 +2,6 @@
 .classpath
 .project
 /trace1.txt
+/output.txt
+/trace2.txt
+/trace_lsp.txt

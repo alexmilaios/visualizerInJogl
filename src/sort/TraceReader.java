@@ -53,7 +53,8 @@ public class TraceReader {
 				sender = LineReader.getSender(line);
 				receiver = LineReader.getReceiver(line);
 				SenderReceiverPairs pair = new SenderReceiverPairs(sender, receiver);
-				pairs.add(pair);
+				if(!pairs.contains(pair))
+					pairs.add(pair);
 			}
 		}
 		return pairs;

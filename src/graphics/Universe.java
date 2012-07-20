@@ -47,11 +47,11 @@ public class Universe extends JFrame implements KeyListener, MouseListener{
 	
 	private boolean mouseClicked;
 	
-	public Universe (List<List<Node>> levels, Vector<SenderReceiverPairs> messages, List<Connection> connections) {
+	public Universe (List<List<Node>> levels, Vector<SenderReceiverPairs> messages, List<Connection> connections, int numOfNodes) {
 		setSize(700, 700);
 		setTitle("Visualization");
 		
-		model = new Model(levels.size(),4, connections,levels,messages);
+		model = new Model(levels.size(), numOfNodes, connections,levels,messages);
 		
 		GraphicListener listener = new GraphicListener();
 		GLCanvas canvas = new GLCanvas(new GLCapabilities(null));
@@ -207,10 +207,12 @@ public class Universe extends JFrame implements KeyListener, MouseListener{
 		
 		if(e.getKeyCode() == KeyEvent.VK_LEFT) {
 			phi += (float) (Math.PI / 14);
+			phi %= 2*Math.PI;
 		}
 		
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
 			phi -= (float) (Math.PI / 14);
+			phi %= 2*Math.PI;
 		}
 		
 		if(e.getKeyCode() == KeyEvent.VK_I) {

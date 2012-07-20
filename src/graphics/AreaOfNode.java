@@ -15,14 +15,14 @@ public class AreaOfNode {
 	
 	public boolean contains(int x, int y){
 		
-		if((x >= center_x - 5) && (x <= center_x + 5))
-			if((y >= center_y - 5) && (y <= center_y + 5)){
+		if((x >= center_x - 5) && (x <= center_x + 5)
+		&& (y >= center_y - 5) && (y <= center_y + 5)){
 			return true;
 		}
 		return false;
 	}
 	
 	public String toString(){
-		return node.toString() + " center_x: " + center_x +  " center_y: " + center_y;
+		return node.toString();
 	}
 }
