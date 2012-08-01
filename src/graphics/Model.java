@@ -59,11 +59,6 @@ public class Model {
 			for(int j = 0; j < numOfNodes; j++) {
 				layer.add(new Vector3f(modelPoints.get(j).x, layer_y - i,modelPoints.get(j).z));
 			}
-			
-			if(i == 0) {
-				layer.add(new Vector3f(0.0f, (float) (levels-1 -(levels-1)/2.0), 0.0f));
-			}
-			
 			layers.add(layer);
 		}
 	}
@@ -118,9 +113,9 @@ public class Model {
 		for(int i = 1; i < sortedGraph.size(); i++) {
 			List<Node> level = sortedGraph.get(i);
 			for(Node node : level) {
-				Vector3f end = layers.get(i).get(node.pair.getNode()-1);
+				Vector3f end = layers.get(i).get(node.pair.getNode());
 				
-				pointForDraw[i][node.pair.getNode()-1] = true;
+				pointForDraw[i][node.pair.getNode()] = true;
 				
 				List<Node> senderList = getSender(node);
 				Iterator<Node> senderItr= senderList.iterator();
@@ -128,7 +123,8 @@ public class Model {
 				while(senderItr.hasNext()) {
 					Node sender = senderItr.next();
 					int senderlevel = getSenderLevel(sender);
-					int senderId = (sender.pair.getNode() == 0) ? numOfNodes : sender.pair.getNode()-1;
+					int senderId =  sender.pair.getNode();
+					//int senderId = (sender.pair.getNode() == 0) ? numOfNodes : sender.pair.getNode()-1;
 					Vector3f start = layers.get(senderlevel).get(senderId);
 					
 					pointForDraw [senderlevel] [senderId] = true;
@@ -198,7 +194,7 @@ public class Model {
         				viewPort, 0, 
         				screenCoordiants, 0);
         		screenCoordiants[1] = viewPort[3] - screenCoordiants[1] + 1;
-        		Node node = new Node(new Pair(j+1, i-1));
+        		Node node = new Node(new Pair(j, i-1));
         		areasOfLevel.add(new AreaOfNode(node, (int) screenCoordiants[0], (int) screenCoordiants[1]));
         	}
         	areas.add(areasOfLevel);

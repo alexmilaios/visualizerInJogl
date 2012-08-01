@@ -23,8 +23,8 @@ public class Topology {
 			SenderReceiverPairs pair = itr.next();
 			Node sender = pair.getSender();
 			Node receiver = pair.getReceiver();
-			Connection temporaryConFront = new Connection(sender.pair.getNode()-1, receiver.pair.getNode()-1);
-			Connection temporaryConBack = new Connection(receiver.pair.getNode()-1, sender.pair.getNode()-1);
+			Connection temporaryConFront = new Connection(sender.pair.getNode(), receiver.pair.getNode());
+			Connection temporaryConBack = new Connection(receiver.pair.getNode(), sender.pair.getNode());
 			if((!topology.contains(temporaryConBack)) && (!topology.contains(temporaryConFront))
 					&& (temporaryConFront.from != -1) && (temporaryConBack.to != -1)){
 				topology.add(temporaryConFront);

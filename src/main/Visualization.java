@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import graph.Connection;
 import graph.Node;
 import graph.Topology;
 import graphics.Universe;
@@ -18,8 +17,9 @@ import sort.SenderReceiverPairs;
 public class Visualization {
 	public static void main(String [] args) {
 		
+		Layers layers = new Layers(new File("trace-thmr.txt"));
 		//Layers layers = new Layers(new File("trace1.txt"));
-		Layers layers = new Layers(new File("trace_lsp.txt"));
+		//Layers layers = new Layers(new File("trace_lsp.txt"));
 		
 		List<List<Node>> levels = layers.layers; 
 		Vector<SenderReceiverPairs> messages = layers.messages; 
@@ -40,7 +40,7 @@ public class Visualization {
 			System.out.println();
 		}*/
 		
-		Universe frame = new Universe(levels,messages,(new Topology(messages)).getTopology(),5);
+		Universe frame = new Universe(levels,messages,(new Topology(messages)).getTopology(),6);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
