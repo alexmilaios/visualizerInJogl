@@ -213,7 +213,7 @@ public class Model {
 				AreaOfNode area = areaItr.next();
 
 				if(area.contains(x, y))
-					System.out.println(area);
+					new Thread(new NodeWindow(area,sortedGraph)).start();
 			}
 		}
 	}

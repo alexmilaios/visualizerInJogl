@@ -17,14 +17,14 @@ import sort.SenderReceiverPairs;
 public class Visualization {
 	public static void main(String [] args) {
 		
-		Layers layers = new Layers(new File("trace-thmr.txt"));
-		//Layers layers = new Layers(new File("trace1.txt"));
+		//Layers layers = new Layers(new File("trace-thmr.txt"));
+		Layers layers = new Layers(new File("trace1.txt"));
 		//Layers layers = new Layers(new File("trace_lsp.txt"));
 		
 		List<List<Node>> levels = layers.layers; 
 		Vector<SenderReceiverPairs> messages = layers.messages; 
 				
-		/*Iterator<List<Node>> itr1 = levels.iterator();
+	/*	Iterator<List<Node>> itr1 = levels.iterator();
 		
 		Iterator<SenderReceiverPairs> itr3 = messages.iterator();
 		while(itr3.hasNext()){
@@ -40,7 +40,7 @@ public class Visualization {
 			System.out.println();
 		}*/
 		
-		Universe frame = new Universe(levels,messages,(new Topology(messages)).getTopology(),6);
+		Universe frame = new Universe(levels,messages,(new Topology(messages)).getTopology(),5);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
