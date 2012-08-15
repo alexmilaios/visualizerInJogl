@@ -3,6 +3,7 @@ package graphics;
 import graph.Connection;
 import graph.Node;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,10 +28,12 @@ public class Model {
 	private List<List<Node>> sortedGraph;
 	private Vector<SenderReceiverPairs> messages;
 	private boolean pointForDraw [] [];  
-	
+	private String [] persistentPredicates, transientPredicates, transportPredicates;
+	private File trace;
 	
 	public Model(int levels, int numOfNodes,List<Connection> connections, 
-			List<List<Node>> sortedGraph, Vector<SenderReceiverPairs> messages){
+			List<List<Node>> sortedGraph, Vector<SenderReceiverPairs> messages,String [] persistentPredicates,
+			String [] transientPredicates,String [] transportPredicates, File trace){
 		this.levels = levels;
 		this.numOfNodes = numOfNodes;
 		layers = new ArrayList<List<Vector3f>>();
@@ -39,6 +42,10 @@ public class Model {
 		this.messages = messages;
 		computePoints();
 		pointForDraw = new boolean[levels] [numOfNodes+1];
+		this.persistentPredicates = persistentPredicates;
+		this.transientPredicates = transientPredicates;
+		this.transportPredicates = transportPredicates;
+		this.trace = trace;
 	}
 	
 	private void computePoints () {
@@ -213,7 +220,8 @@ public class Model {
 				AreaOfNode area = areaItr.next();
 
 				if(area.contains(x, y))
-					new Thread(new NodeWindow(area,sortedGraph)).start();
+					new Thread(new NodeWindow(area,sortedGraph,persistentPredicates,
+							transientPredicates,transportPredicates,trace)).start();
 			}
 		}
 	}

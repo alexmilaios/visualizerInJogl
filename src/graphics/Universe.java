@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
@@ -47,11 +48,14 @@ public class Universe extends JFrame implements KeyListener, MouseListener{
 	
 	private boolean mouseClicked;
 	
-	public Universe (List<List<Node>> levels, Vector<SenderReceiverPairs> messages, List<Connection> connections, int numOfNodes) {
+	public Universe (List<List<Node>> levels, Vector<SenderReceiverPairs> messages, 
+				List<Connection> connections, int numOfNodes,String [] persistenPredicates, 
+				String [] transientPredicates, String [] transportPredicates,File trace) {
 		setSize(700, 700);
 		setTitle("Visualization");
 		
-		model = new Model(levels.size(), numOfNodes, connections,levels,messages);
+		model = new Model(levels.size(), numOfNodes, connections,levels,messages,persistenPredicates,
+				transientPredicates,transportPredicates,trace);
 		
 		GraphicListener listener = new GraphicListener();
 		GLCanvas canvas = new GLCanvas(new GLCapabilities(null));
@@ -268,6 +272,4 @@ public class Universe extends JFrame implements KeyListener, MouseListener{
 		// TODO Auto-generated method stub
 		
 	}
-
-
 }

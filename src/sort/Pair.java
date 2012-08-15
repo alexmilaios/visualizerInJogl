@@ -33,4 +33,9 @@ public class Pair {
 	public String present() {
 		return "pair(" + node + "," + time+")";
 	}
+	
+	public boolean equals(Object obj) {
+		Pair tmp = (Pair) obj;
+		return present().equals(tmp.present());
+	}
 }
